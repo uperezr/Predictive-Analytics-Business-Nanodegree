@@ -1,0 +1,48 @@
+SELECT a.ProductName, a.Quantity_first, a.Year, b.Quantity_last, b.Year, b.Quantity_last - a.Quantity_first AS change_quantity
+FROM
+(SELECT p.ProductID,
+		p.ProductName, 
+		od.Quantity as Quantity_first,
+		ca.CategoryName,
+		o.OrderDate, 
+		STRFTIME('%Y', o.OrderDate) as Year
+FROM 	Products p
+JOIN	Categories ca
+ON		p.CategoryID = ca.CategoryID
+JOIN 	OrderDetails od
+ON 		od.ProductID = p.ProductID
+JOIN 	Orders o
+ON 		o.OrderID = od.OrderID
+WHERE STRFTIME('%Y', o.OrderDate) = 
+(
+SELECT MIN(STRFTIME('%Y', o.OrderDate))
+FROM Orders o
+)
+GROUP BY p.ProductID, STRFTIME('%Y', o.OrderDate)
+) AS a
+LEFT join
+(
+SELECT 	p.ProductID,
+		p.ProductName, 
+		od.Quantity as Quantity_last,
+		ca.CategoryName,
+		o.OrderDate,
+		STRFTIME('%Y', o.OrderDate) as Year
+FROM 	Products p
+JOIN	Categories ca
+ON		p.CategoryID = ca.CategoryID
+JOIN 	OrderDetails od
+ON 		od.ProductID = p.ProductID
+JOIN 	Orders o
+ON 		o.OrderID = od.OrderID
+WHERE STRFTIME('%Y', o.OrderDate) = 
+(
+SELECT MAX(STRFTIME('%Y', o.OrderDate))
+FROM Orders o
+)
+GROUP BY p.ProductID, STRFTIME('%Y', o.OrderDate)
+) AS b
+ON a.ProductID = b.ProductID
+WHERE change_quantity > 0
+/*WHERE change_quantity < 0*/
+ORDER BY 6 DESC

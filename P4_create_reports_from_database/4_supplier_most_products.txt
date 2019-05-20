@@ -1,0 +1,11 @@
+SELECT 	CompanyName,
+		COUNT(CompanyName)
+FROM(
+SELECT 	p.ProductName AS ProductName,
+		s.CompanyName AS CompanyName
+FROM 	Products p
+JOIN	Suppliers s
+ON		p.SupplierID = s.SupplierID
+)table_query
+GROUP BY 1
+ORDER BY 2 DESC

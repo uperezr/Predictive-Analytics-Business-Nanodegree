@@ -1,0 +1,17 @@
+SELECT  CategoryName,
+		SUM(total_revenue) AS sum_revenue
+FROM(
+SELECT 	p.ProductName,
+		p.UnitPrice * od.Quantity AS total_revenue,
+		ca.CategoryName
+FROM 	Products p
+JOIN	Categories ca
+ON		p.CategoryID = ca.CategoryID
+JOIN 	OrderDetails od
+ON 		od.ProductID = p.ProductID
+JOIN 	Orders o
+ON 		o.OrderID = od.OrderID
+WHERE   STRFTIME('%Y', o.OrderDate)='2016'
+)table_query
+GROUP 	BY 1
+ORDER 	BY 2 DESC
